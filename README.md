@@ -1,6 +1,6 @@
 
 
-This repo contains mopdiefie Ultralytics inference and training code for YOLOv3 in PyTorch. The code works on Linux, MacOS and Windows. Credit to Joseph Redmon for YOLO  https://pjreddie.com/darknet/yolo/.
+This repo contains modified Ultralytics inference and training code for YOLOv3 in PyTorch. The code works on Linux, MacOS and Windows. Credit to Joseph Redmon for YOLO  https://pjreddie.com/darknet/yolo/.
 
 
 ## Requirements
@@ -11,10 +11,9 @@ $ pip install -U -r requirements.txt
 ```
 
 ## How to use
-* dowload weights from google drive link in weights folder
+* download weights from google drive link in weights folder
 * look at "simple_test.ipynb" to test if all dependencies are installed correctly and to see the simplest way to pass the model on images is
-
-
+* note: classes.names is in cfg folder
 
 
 
