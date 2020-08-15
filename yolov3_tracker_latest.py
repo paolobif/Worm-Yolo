@@ -9,10 +9,7 @@ from yolov3_core import ImageInLine
 from yolov3_core import ImageProcessor
 from yolov3_core import *
 
-VIDEO = False
-video_directory = ''
-
-images_directory = 'data/samples'
+COLOR = '\033[1;37;46m'
 
 def load_images_to_array(im_dir):
     #data_ = defaultdict()
@@ -48,7 +45,7 @@ if __name__ == "__main__":
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--classes', nargs='+', type=int, help='filter by class')
 
-    parser.add_argument('--out_path', type=str, default='output/custom/')
+    parser.add_argument('--out_path', type=str, default='output/custom')
     parser.add_argument("--data_path", type=str, default='data/samples' help="path the video file or to the directory with stack of images")
     parser.add_argument("--video", action='store_true', help="save the labled images as a video")
     parser.add_argument("--csv", action='store_true', help="save the bounding box data into a csv in the out directory")
@@ -71,7 +68,30 @@ if __name__ == "__main__":
     INPUT_VIDEO = bool
     if ".avi" in opt.data_path:
         INPUT_VIDEO = True
-        print("\n Input being processed as a video \n")
+        print(COLOR+"--Input being processed as a video--")
+    else:
+        INPUT_VIDEO = False
+        print(COLOR+"--Input is stack of images--")
+        Stack = load_images_to_array(op.data_path)
+        print(COLOR+"Images succesfully loaded")
+
+    # fork video out vs images out as the output currently not setup fror images to video
+    OUT_VIDEO = opt.video
+    if OUT_VIDEO == True:
+        #### need to create out path when input is directory ####
+        out_video_path = f"{opt.out_path}/{os.path.basename(opt.data_path).strip('.avi')}_anotated.avi"
+        if os.path.exists(out_video_path):
+            n = 1
+            while os.path.exists(out_video_path):
+                out_video_path = f"{out_video_path.strip('.avi')}_anotated{n}.avi"
+                n += 1
+        # set up video capture and write
+        vid = cv2.VideoCapture(opt.data_path)
+        vid_width = vid.get(cv2.CAP_PROP_FRAME_WIDTH)
+        vid_height = vid.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+        writer = cv2.VideoWriter(out_video_path, fourcc, 10, (vid_width, vid_height), True) # currently set to 10fps
+
 
 
     # load yolov3 model
