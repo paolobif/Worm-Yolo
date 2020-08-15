@@ -12,7 +12,7 @@ from yolov3_core import *
 VIDEO = False
 video_directory = ''
 
-images_directory = 'data/samples'
+images_directory = 'data/test_images'
 
 def load_images_to_array(im_dir):
     #data_ = defaultdict()
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     parser.add_argument('--classes', nargs='+', type=int, help='filter by class')
 
     parser.add_argument('--out_path', type=str, default='output/custom/')
-    parser.add_argument("--data_path", type=str, default='data/samples' help="path the video file or to the directory with stack of images")
+    parser.add_argument("--data_path", type=str, default='data/samples', help="path the video file or to the directory with stack of images")
     parser.add_argument("--video", action='store_true', help="save the labled images as a video")
     parser.add_argument("--csv", action='store_true', help="save the bounding box data into a csv in the out directory")
     opt = parser.parse_args()
