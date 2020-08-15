@@ -1,3 +1,6 @@
 ## us the following link to download weights for first dataset of ~400 images ##
 https://drive.google.com/file/d/1jUMo-fFzomoC9R6VTutOoH-rQLyFJr7Q/view?usp=sharing
-##
+###
+weights for latest full dataset -- slices are 416 then upscaled to 608. Rectangular training.
+Data set info:
+https://drive.google.com/file/d/1ug9E2mAFVEZTHgCyLKooA_y0Y8OQvNph/view?usp=sharing
