@@ -24,10 +24,11 @@ if you wanted to generate csv file from the images you'd run:
 -- $ python3 yolov3_tracker_latest.py --weights %path_to_weights% --out_path %save_folder% --data_path %images_folder% --csv
 * if you also wanted to generate anotated png files you would add --img to the end.
 
+
 ## Data Info
 * approximately 1068 images 1080x1920
 * 56,047 individual worms
-
+* --csv tag saves 1 csv per image in the format: img_name, x1, y1, w, h
 ## Citation
 
  https://pjreddie.com/media/files/papers/YOLOv3.pdf
