@@ -15,6 +15,14 @@ $ pip install -U -r requirements.txt
 * look at "simple_test.ipynb" to test if all dependencies are installed correctly and to see the simplest way to pass the model on images is
 * note: classes.names is in cfg folder
 
+* using csv and img options:
+-- $ python3 yolov3_tracker_latest.py -h
+the only arguments that you should have to set are: weights, out_path, data_path, video, csv, img
+-- note: currently video doesn't work
+* example
+if you wanted to generate csv file from the images you'd run:
+-- $ python3 yolov3_tracker_latest.py --weights %path_to_weights% --out_path %save_folder% --data_path %images_folder% --csv
+if you also wanted to generate anotated png files you would add --img to the end.
 
 ## Data Info
 * approximately 1068 images 1080x1920
@@ -22,4 +30,4 @@ $ pip install -U -r requirements.txt
 
 ## Citation
 
-[![DOI](https://zenodo.org/badge/146165888.svg)](https://zenodo.org/badge/latestdoi/146165888)
+ https://pjreddie.com/media/files/papers/YOLOv3.pdf
