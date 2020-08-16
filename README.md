@@ -22,8 +22,8 @@ the only arguments that you should have to set are: weights, out_path, data_path
 * example
 if you wanted to generate csv file from the images you'd run:
 -- $ python3 yolov3_tracker_latest.py --weights %path_to_weights% --out_path %save_folder% --data_path %images_folder% --csv
-*if you also wanted to generate anotated png files you would add --img to the end.
-**
+* if you also wanted to generate anotated png files you would add --img to the end.
+
 ## Data Info
 * approximately 1068 images 1080x1920
 * 56,047 individual worms
