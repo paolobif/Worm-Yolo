@@ -74,12 +74,12 @@ class YoloModelLatest():
 
     ### PASSES LIST OF FRAMES THROUGH MODEL AND RETURNS BOUNDING BOXES
     def pass_model(self, dataset_dict):
-        print(f"number of slices bring processed: {len(dataset_dict)}")
+        #print(f"number of slices bring processed: {len(dataset_dict)}")
 
         Tensor = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
         keys = []  # Stores image paths
         img_detections = []  # Stores detections for each image index
-        print("\nPerforming object detection:")
+        #print("\nPerforming object detection:")
         prev_time = time.time()
 
         dataset = CustomLoadImages(dataset_dict, img_size=self.img_size) # key, image
@@ -122,7 +122,7 @@ class YoloModelLatest():
         outputs = []
         for img_i, (key, detections) in enumerate(zip(keys, img_detections)):
 
-            print(img_i, key)
+            #print(img_i, key)
             slice = dataset_dict[key]['image']
             cord = dataset_dict[key]['cord']
 
@@ -145,10 +145,7 @@ class YoloModelLatest():
             else:
                 print(f"{img_i} Image: {key}, Cord: {cord} --- worms: 0")
 
-
-
         return(outputs)
-
 
 
 def pad_to_square(img, pad_value):
@@ -196,7 +193,7 @@ class ImageInLine(Dataset):
         img = img[:, :, ::-1].transpose(2,0,1) # conver bgr to rgb
         img = np.ascontiguousarray(img)
 
-        print(key, img.shape)
+        #print(key, img.shape)
         #if isinstance(img, list):
             #img = np.asarray(img)
 

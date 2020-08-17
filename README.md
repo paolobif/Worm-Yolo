@@ -32,5 +32,3 @@ if you wanted to generate csv file from the images you'd run:
 ## Citation
 
  https://pjreddie.com/media/files/papers/YOLOv3.pdf
-
-*test**

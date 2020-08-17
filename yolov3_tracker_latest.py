@@ -1,21 +1,22 @@
 import os
 import cv2
 import csv
+import time
 import argparse
+import tqdm
 import numpy as np
 import pandas as pd
 from PIL import Image
 from collections import defaultdict
-from yolov3_core import YoloModelLatest
-from yolov3_core import ImageInLine
-from yolov3_core import ImageProcessor
+
 from yolov3_core import *
 
+# not being used...
 def load_images_to_array(im_dir):
     #data_ = defaultdict()
     data__ = []
     image_names = os.listdir(im_dir)
-    for name in image_names:
+    for name in tqdm.tqdm(image_names, desc="Fetching Images"):
         img0 = cv2.imread(f"{im_dir}/{name}")
         data__.append(img0)
     return data__, image_names
@@ -27,7 +28,7 @@ def draw_on_im(img, x1, y1, x2, y2, conf, col, text=None):
 
     cv2.rectangle(img, (x1,y1), (x2,y2), col, 2)
     if text is not None:
-        cv2.putText(img, text, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, col, 2)
+        cv2.putText(img, text, (x1, y1-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, col, 2)
 
 
 # creates pandas df for easy csv saving.
@@ -60,6 +61,7 @@ if __name__ == "__main__":
     parser.add_argument('--out_path', type=str, default='output/custom')
     parser.add_argument("--data_path", type=str, default='data/samples', help="path the video file or to the directory with stack of images")
     parser.add_argument("--video", action='store_true', help="save the labled images as a video")
+    parser.add_argument("--retro", action='store_true', help="processes images in reverse to make time of death calls")
     parser.add_argument("--csv", action='store_true', help="save the bounding box data into a csv in the out directory")
     parser.add_argument("--img", action='store_true', help="store as image")
     opt = parser.parse_args()
@@ -101,11 +103,12 @@ if __name__ == "__main__":
         if os.path.exists(out_video_path):
             n = 1
             while os.path.exists(out_video_path):
-                out_video_path = f"{out_video_path.strip('.avi')}_anotated{n}.avi"
+                out_video_path = f"{out_video_path.strip('.avi')}_{n}.avi"
                 n += 1
         # set up video capture and write
         fourcc = cv2.VideoWriter_fourcc(*"MJPG")
         writer = cv2.VideoWriter(out_video_path, fourcc, 10, (1920, 1080), True) # currently set to 10fps
+        print(f"generating video at {out_video_path}")
 
 
     # load yolov3 model and start processing
@@ -122,12 +125,15 @@ if __name__ == "__main__":
             outputs = Yolo.pass_model(input_dict)
 
     elif INPUT_VIDEO == False:
-        stack, file_names = load_images_to_array(opt.data_path)
-        for frame, name in zip(stack, file_names):
+        start_time = time.time()
+        file_names = sorted(os.listdir(opt.data_path))
+        for i, file_name in enumerate(file_names):
+            print(file_name)
+            frame = cv2.imread(f"{opt.data_path}/{file_name}")
             frame_obj = ImageProcessor(frame, out_size=SLICE_SIZE)
             input_dict = frame_obj.image_slices
             outputs = Yolo.pass_model(input_dict)
-
+            print(f"\t Image: {i}/{len(file_names)}")
             if opt.csv == True:
                 raw_name, extension = name.split(".")
                 csv_df = pd_for_csv(outputs, img_name=name)
@@ -138,3 +144,13 @@ if __name__ == "__main__":
                     x1, y1, x2, y2, conf, cls_conf = output
                     draw_on_im(frame, x1, y1, x2, y2, conf, (100,255,0), text="Worm")
                 cv2.imwrite(f"{opt.out_path}/{name}_anotated.png", frame)
+
+            if opt.video == True:
+                for output in outputs:
+                    x1, y1, x2, y2, conf, cls_conf = output
+                    draw_on_im(frame, x1, y1, x2, y2, conf, (100,255,0), text="Worm")
+                writer.write(frame)
+
+        finish_time = time.time()
+        process_time = datetime.timedelta(seconds=finish_time-start_time)
+        print(f"{len(file_names)} Images with \nimg: {opt.img} \nvideo: {opt.video} \ncsv: {opt.csv} \n took: {process_time} long")
