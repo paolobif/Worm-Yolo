@@ -135,15 +135,15 @@ if __name__ == "__main__":
             outputs = Yolo.pass_model(input_dict)
             print(f"\t Image: {i}/{len(file_names)}")
             if opt.csv == True:
-                raw_name, extension = name.split(".")
-                csv_df = pd_for_csv(outputs, img_name=name)
+                raw_name, extension = file_name.split(".")
+                csv_df = pd_for_csv(outputs, img_name=file_name)
                 csv_df.to_csv(f"{opt.out_path}/{raw_name}_NN.csv", header=None, index=None)
 
             if opt.img == True:
                 for output in outputs:
                     x1, y1, x2, y2, conf, cls_conf = output
                     draw_on_im(frame, x1, y1, x2, y2, conf, (100,255,0), text="Worm")
-                cv2.imwrite(f"{opt.out_path}/{name}_anotated.png", frame)
+                cv2.imwrite(f"{opt.out_path}/{file_name}_anotated.png", frame)
 
             if opt.video == True:
                 for output in outputs:
