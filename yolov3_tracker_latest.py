@@ -9,6 +9,7 @@ import pandas as pd
 from PIL import Image
 from collections import defaultdict
 
+from utils.tracker import CentroidTracker
 from yolov3_core import *
 
 # not being used...
@@ -61,7 +62,7 @@ if __name__ == "__main__":
     parser.add_argument('--out_path', type=str, default='output/custom')
     parser.add_argument("--data_path", type=str, default='data/samples', help="path the video file or to the directory with stack of images")
     parser.add_argument("--video", action='store_true', help="save the labled images as a video")
-    parser.add_argument("--retro", action='store_true', help="processes images in reverse to make time of death calls")
+    parser.add_argument("--track", action='store_true', help="processes images in reverse to make time of death calls")
     parser.add_argument("--csv", action='store_true', help="save the bounding box data into a csv in the out directory")
     parser.add_argument("--img", action='store_true', help="store as image")
     opt = parser.parse_args()
@@ -113,6 +114,7 @@ if __name__ == "__main__":
 
     # load yolov3 model and start processing
     Yolo = YoloModelLatest(settings)
+
     # start parsing and processing
     if INPUT_VIDEO == True:
         vid = cv2.VideoCapture(opt.data_path)
