@@ -62,9 +62,12 @@ if __name__ == "__main__":
     parser.add_argument('--out_path', type=str, default='output/custom')
     parser.add_argument("--data_path", type=str, default='data/samples', help="path the video file or to the directory with stack of images")
     parser.add_argument("--video", action='store_true', help="save the labled images as a video")
+    ### track ###
     parser.add_argument("--track", action='store_true', help="processes images in reverse to make time of death calls")
+    ### track ###
     parser.add_argument("--csv", action='store_true', help="save the bounding box data into a csv in the out directory")
     parser.add_argument("--img", action='store_true', help="store as image")
+    parser.add_argument("--retro", action='store_true', help="processes images in reverse to make time of death call")
     opt = parser.parse_args()
 
     # create settings dictionaryprint(input_img.shape)
@@ -114,7 +117,8 @@ if __name__ == "__main__":
 
     # load yolov3 model and start processing
     Yolo = YoloModelLatest(settings)
-
+    # init tracker. in future can impliment other trackers
+    tracker = CentroidTracker() if opt.track else "none"
     # start parsing and processing
     if INPUT_VIDEO == True:
         vid = cv2.VideoCapture(opt.data_path)
@@ -129,6 +133,7 @@ if __name__ == "__main__":
     elif INPUT_VIDEO == False:
         start_time = time.time()
         file_names = sorted(os.listdir(opt.data_path))
+        if opt.retro: file_names.reverse()
         for i, file_name in enumerate(file_names):
             print(file_name)
             frame = cv2.imread(f"{opt.data_path}/{file_name}")
@@ -151,6 +156,18 @@ if __name__ == "__main__":
                 for output in outputs:
                     x1, y1, x2, y2, conf, cls_conf = output
                     draw_on_im(frame, x1, y1, x2, y2, conf, (100,255,0), text="Worm")
+                ### tracking ###
+                if opt.track == True:
+                    tracker_input = np.asarray(outputs)[:,:4]
+                    tracker_output = tracker.update(tracker_input)
+                    if tracker_output == None:
+                        pass
+                    else:
+                        for id in tracker_output:
+                            print(id)
+                            x, y = tracker_output[id]
+                            cv2.putText(frame, str(id), (x+15, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,102,102), 2)
+                ### tracking ###
                 writer.write(frame)
 
         finish_time = time.time()
