@@ -119,6 +119,8 @@ if __name__ == "__main__":
     Yolo = YoloModelLatest(settings)
     # init tracker. in future can impliment other trackers
     tracker = CentroidTracker() if opt.track else "none"
+
+
     # start parsing and processing
     if INPUT_VIDEO == True:
         vid = cv2.VideoCapture(opt.data_path)
@@ -133,7 +135,10 @@ if __name__ == "__main__":
     elif INPUT_VIDEO == False:
         start_time = time.time()
         file_names = sorted(os.listdir(opt.data_path))
+        head_name = os.path.basename(opt.data_path)
+
         if opt.retro: file_names.reverse()
+
         for i, file_name in enumerate(file_names):
             print(file_name)
             frame = cv2.imread(f"{opt.data_path}/{file_name}")
@@ -141,10 +146,13 @@ if __name__ == "__main__":
             input_dict = frame_obj.image_slices
             outputs = Yolo.pass_model(input_dict)
             print(f"\t Image: {i}/{len(file_names)}")
+
             if opt.csv == True:
                 raw_name, extension = file_name.split(".")
-                csv_df = pd_for_csv(outputs, img_name=file_name)
-                csv_df.to_csv(f"{opt.out_path}/{raw_name}_NN.csv", header=None, index=None)
+                new_name  = f"{head_name}_{i}"
+                os.rename(f"{opt.data_path}/{file_name}", f"{opt.data_path}/{new_name}.{extension}")
+                csv_df = pd_for_csv(outputs, img_name=f"{new_name}.{extension}")
+                csv_df.to_csv(f"{opt.out_path}/{new_name}_NN.csv", header=True, index=None)
 
             if opt.img == True:
                 for output in outputs:
