@@ -149,7 +149,7 @@ if __name__ == "__main__":
 
             if opt.csv == True:
                 raw_name, extension = file_name.split(".")
-                new_name  = f"{head_name}_{i}"
+                new_name  = f"exp{head_name}_{i}"
                 os.rename(f"{opt.data_path}/{file_name}", f"{opt.data_path}/{new_name}.{extension}")
                 csv_df = pd_for_csv(outputs, img_name=f"{new_name}.{extension}")
                 csv_df.to_csv(f"{opt.out_path}/{new_name}_NN.csv", header=True, index=None)
