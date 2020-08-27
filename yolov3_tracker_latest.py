@@ -150,9 +150,16 @@ if __name__ == "__main__":
             if opt.csv == True:
                 raw_name, extension = file_name.split(".")
                 new_name  = f"exp{head_name}_{i}"
-                os.rename(f"{opt.data_path}/{file_name}", f"{opt.data_path}/{new_name}.{extension}")
+                # if slow can use shutil to copy and rename instead of writing a new image...
+                if not os.path.exists(f"{opt.out_path}/NN_pretrain_im"):
+                    os.mkdir(f"{opt.out_path}/NN_pretrain_im")
+                if not os.path.exists(f"{opt.out_path}/NN_pretrain_csv"):
+                    os.mkdir(f"{opt.out_path}/NN_pretrain_csv")
+
+                cv2.imwrite(f"{opt.out_path}/NN_pretrain_im/{new_name}.{extension}", frame)
+
                 csv_df = pd_for_csv(outputs, img_name=f"{new_name}.{extension}")
-                csv_df.to_csv(f"{opt.out_path}/{new_name}_NN.csv", header=True, index=None)
+                csv_df.to_csv(f"{opt.out_path}/NN_pretrain_csv/{new_name}_NN.csv", header=True, index=None)
 
             if opt.img == True:
                 for output in outputs:
