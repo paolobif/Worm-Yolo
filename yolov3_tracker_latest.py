@@ -124,27 +124,37 @@ if __name__ == "__main__":
     # start parsing and processing
     if INPUT_VIDEO == True:
         vid = cv2.VideoCapture(opt.data_path)
-        frame_num = 0
+        total_frame_count = vid.get(cv2.CAP_PROP_FRAME_COUNT)
         while (1):
             ret, frame = vid.read()
-            total_frame_count = vid.get(cv2.CAP_PROP_POS_FRAMES)
-            frame_num += 1
+            frame_count = vid.get(cv2.CAP_PROP_POS_FRAMES)
 
             frame_obj = ImageProcessor(frame, out_size=SLICE_SIZE)
             input_dict = frame_obj.image_slices
             outputs = Yolo.pass_model(input_dict)
-            print(f"Frame {frame_num}/{total_frame_count}")
+            print(f"Frame {frame_count}/{total_frame_count}")
 
             if opt.img == True:
                 for output in outputs:
                     x1, y1, x2, y2, conf, cls_conf = output
                     draw_on_im(frame, x1, y1, x2, y2, conf, (100,255,0), text="Worm")
-                cv2.imwrite(f"{opt.out_path}/frame{frame_num}_anotated.png", frame)
+                cv2.imwrite(f"{opt.out_path}/frame{frame_count}_anotated.png", frame)
 
             if opt.video == True:
                 for output in outputs:
                     x1, y1, x2, y2, conf, cls_conf = output
                     draw_on_im(frame, x1, y1, x2, y2, conf, (100,255,0), text="Worm")
+                ### tracking ###
+                if opt.track == True:
+                    tracker_input = np.asarray(outputs)[:,:4]
+                    tracker_output = tracker.update(tracker_input)
+                    if tracker_output == None:
+                        pass
+                    else:
+                        for id in tracker_output:
+                            print(id)
+                            x, y = tracker_output[id]
+                            cv2.putText(frame, str(id), (x+15, y+10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,102,102), 2)
                 writer.write(frame)
 
     elif INPUT_VIDEO == False:
@@ -203,3 +213,5 @@ if __name__ == "__main__":
         finish_time = time.time()
         process_time = datetime.timedelta(seconds=finish_time-start_time)
         print(f"{len(file_names)} Images with \nimg: {opt.img} \nvideo: {opt.video} \ncsv: {opt.csv} \n took: {process_time} long")
+
+# print('hello world!')
