@@ -124,13 +124,28 @@ if __name__ == "__main__":
     # start parsing and processing
     if INPUT_VIDEO == True:
         vid = cv2.VideoCapture(opt.data_path)
+        frame_num = 0
         while (1):
             ret, frame = vid.read()
-            frame_count = vid.get(cv2.CAP_PROP_POS_FRAMES)
+            total_frame_count = vid.get(cv2.CAP_PROP_POS_FRAMES)
+            frame_num += 1
 
             frame_obj = ImageProcessor(frame, out_size=SLICE_SIZE)
             input_dict = frame_obj.image_slices
             outputs = Yolo.pass_model(input_dict)
+            print(f"Frame {frame_num}/{total_frame_count}")
+
+            if opt.img == True:
+                for output in outputs:
+                    x1, y1, x2, y2, conf, cls_conf = output
+                    draw_on_im(frame, x1, y1, x2, y2, conf, (100,255,0), text="Worm")
+                cv2.imwrite(f"{opt.out_path}/frame{frame_num}_anotated.png", frame)
+
+            if opt.video == True:
+                for output in outputs:
+                    x1, y1, x2, y2, conf, cls_conf = output
+                    draw_on_im(frame, x1, y1, x2, y2, conf, (100,255,0), text="Worm")
+                writer.write(frame)
 
     elif INPUT_VIDEO == False:
         start_time = time.time()
