@@ -66,6 +66,7 @@ if __name__ == "__main__":
     parser.add_argument("--track", action='store_true', help="processes images in reverse to make time of death calls")
     ### track ###
     parser.add_argument("--csv", action='store_true', help="save the bounding box data into a csv in the out directory")
+    parser.add_argument("--csv2", action='store_true', help="save the bounding box data into a csv. one for all images")
     parser.add_argument("--img", action='store_true', help="store as image")
     parser.add_argument("--retro", action='store_true', help="processes images in reverse to make time of death call")
     opt = parser.parse_args()
@@ -125,6 +126,8 @@ if __name__ == "__main__":
     if INPUT_VIDEO == True:
         vid = cv2.VideoCapture(opt.data_path)
         total_frame_count = vid.get(cv2.CAP_PROP_FRAME_COUNT)
+        video_name = os.path.basename(opt.data_path).strip('.avi')
+
         while (1):
             ret, frame = vid.read()
             frame_count = vid.get(cv2.CAP_PROP_POS_FRAMES)
@@ -133,6 +136,11 @@ if __name__ == "__main__":
             input_dict = frame_obj.image_slices
             outputs = Yolo.pass_model(input_dict)
             print(f"Frame {frame_count}/{total_frame_count}")
+
+            if opt.csv2 == True:
+                new_name = f"frame_{int(frame_count)}"
+                df = pd_for_csv(outputs, img_name=f"{new_name}")
+                df.to_csv(f"{opt.out_path}/{video_name}.csv", mode='a', header=False, index=None)
 
             if opt.img == True:
                 for output in outputs:
@@ -184,7 +192,16 @@ if __name__ == "__main__":
                 cv2.imwrite(f"{opt.out_path}/NN_pretrain_im/{new_name}.{extension}", frame)
 
                 csv_df = pd_for_csv(outputs, img_name=f"{new_name}.{extension}")
-                csv_df.to_csv(f"{opt.out_path}/NN_pretrain_csv/{new_name}_NN.csv", header=True, index=None)
+
+                if opt.csv2 == True:
+                    csv_df.to_csv(f"{opt.out_path}/NN_pretrain_csv/{head_name}_NN.csv", mode='a', header=False, index=None)
+                else:
+                    csv_df.to_csv(f"{opt.out_path}/NN_pretrain_csv/{new_name}_NN.csv", header=True, index=None)
+
+            if opt.csv2 == True:
+                new_name = f"frame_{frame_count}"
+                df = pd_for_csv(outputs, img_name=f"{new_name}")
+                df.to_csv(f"{video_name}.csv", mode='a', header=True, index=None)
 
             if opt.img == True:
                 for output in outputs:
