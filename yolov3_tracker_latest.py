@@ -39,8 +39,10 @@ def pd_for_csv(outputs, img_name = "name"):
         x1, y1, x2, y2, *_ = output
         w = abs(x2-x1)
         h = abs(y2-y1)
-        csv_outputs.append([img_name, x1.tolist(), y1.tolist(), w.tolist(), h.tolist()]) # ideally change to list earlier bc now outputs is a mix of tensors and lists....
+        csv_outputs.append([img_name, "worm", x1.tolist(), y1.tolist(), w.tolist(), h.tolist()]) # ideally change to list earlier bc now outputs is a mix of tensors and lists....
     out_df = pd.DataFrame(csv_outputs)
+    # change header to datacells for R-shiny processing
+    out_df = out_df.set_axis(['dataCells1','dataCells2','dataCells3','dataCells4','dataCells5','dataCells6'], axis=1)
     return out_df
 
 
